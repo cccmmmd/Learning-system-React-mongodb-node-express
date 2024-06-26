@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const userRegisterValidation = require("../validation").userRegisterValidation;
 const userLoginValidation = require("../validation").userLoginValidation;
-const User = require("../modules/").user;
+const User = require("../models").user;
 const jwt = require("jsonwebtoken");
 
 router.use((req, res, next) => {
@@ -51,13 +51,13 @@ router.post("/login", async (req, res) => {
         if (err) return res.status(500).send(err);
     
         if (isMatch) {
-          // 製作json web token
+          // 可製作json web token
           const tokenObject = { _id: userFound._id, email: userFound.email };
           const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
           return res.send({
             message: "成功登入",
             token: "JWT " + token,
-            user: userFound,
+            user: userFound, //該 user 資料庫的資訊
           });
         } else {
           return res.status(401).send("密碼錯誤");

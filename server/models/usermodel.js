@@ -29,15 +29,18 @@ const userShema = new Schema({
 		type: Date,
 		default: Date.now,
 	},
-});
+},{
+	methods:{
+		isStudent() {
+			return this.role == "student";
+		},
+		isTeacher(){
+			return this.role == "teacher";
+		}
+	}
+}
+);
 
-userShema.method.isStudent = function () {
-	return this.role == "student";
-};
-
-userShema.method.isTeacher = function () {
-	return this.role == "teacher";
-};
 userShema.methods.comparePassword = async function (password, callback) {
 	// let result = await bcrypt.compare(password, this.password); //password user input, password in user model
 	// return callback(null, result);
@@ -51,6 +54,7 @@ userShema.methods.comparePassword = async function (password, callback) {
 };
 
 //middleware
+//if it is a new user or he is changing password then encoding password
 userShema.pre("save", async function (next) {
 	if (this.isNew || this.isModified("password")) {
 		const hashValue = await bcrypt.hash(this.password, 10);
